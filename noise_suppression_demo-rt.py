@@ -17,7 +17,6 @@
 """
 import logging as log
 import sys
-import time
 from argparse import ArgumentParser, SUPPRESS
 from pathlib import Path
  
@@ -25,7 +24,6 @@ import pyaudio
 import cv2
  
 import numpy as np
-import wave
  
 from openvino.inference_engine import IECore, Blob
  
