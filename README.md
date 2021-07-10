@@ -25,8 +25,8 @@ Intel OpenVINO Toolkit 2021.4にディープラーニングベースのオーデ
 python3 -m pip install -r requirements.in
 ```
 
-3. Obtain OMZ model  
- Use '`model downloader`' in OpenVINO to download the `noise-suppressioin-poconetlike-0001` model.  
+3. Obtain noise-suppression model from OMZ (OpenVINO Open Model Zoo)  
+ Use **model downloader** in OpenVINO to download the `noise-suppressioin-poconetlike-0001` model.  
  ```sh
  python3 $INTEL_OPENVINO_DIR/deployment_tools/open_model_zoo/tools/downloader/downloader.py --name noise-suppression-poconetlike-0001
  ```
@@ -36,7 +36,7 @@ python3 -m pip install -r requirements.in
 
 5. Run demo program  
 ```sh
-python3 noise_suppression_demo-rt.py -m intel/noise-suppression-poconetlike-0001/FP16/noise-suppression-poconetlike-0001.xml -d CPU
+python3 noise_suppression_demo-rt.py -m ./intel/noise-suppression-poconetlike-0001/FP16/noise-suppression-poconetlike-0001.xml -d CPU
 ```  
 * `noise_suppression_demo-rt-mt.py` is a **multi-threaded version** of the same demo. Audio recording and playback portion are run in isolated threads from the main inference thread.    
 
