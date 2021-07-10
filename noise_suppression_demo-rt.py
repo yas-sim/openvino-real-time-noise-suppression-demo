@@ -135,7 +135,7 @@ def main():
             output_audio = (res['output'].buffer[0] * np.iinfo(np.int16).max).astype(np.int16)
         else:
             output_audio = input
-        playback_stream.write(output_audio)
+        playback_stream.write(output_audio, input_size)
  
     record_stream.stop_stream()
     record_stream.close()
