@@ -56,7 +56,7 @@ def cb_record():
     global exit_flag
     record_stream = audio.open(format=pyaudio.paInt16, channels=1, rate=16000, input =True, frames_per_buffer=input_size)
     while not exit_flag:
-        audio_data = record_stream.read(input_size)
+        audio_data = record_stream.read(num_frames=input_size)
         record_buf_lock.acquire()
         record_buf.append(audio_data)
         record_buf_lock.release()
@@ -78,7 +78,7 @@ def cb_playback():
             playback_buf_lock.acquire()
             while len(playback_buf):
                 audio_data = playback_buf.pop(0)
-                playback_stream.write(audio_data, input_size)
+                playback_stream.write(frames=audio_data, num_frames=input_size)
             playback_buf_lock.release()
         time.sleep(0.1)
     playback_stream.stop_stream()

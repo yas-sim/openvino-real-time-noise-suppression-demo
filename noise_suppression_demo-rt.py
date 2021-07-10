@@ -106,7 +106,7 @@ def main():
             else:
                 print('Noise suppression is diabled')
  
-        input = np.frombuffer(record_stream.read(input_size), dtype=np.int16)
+        input = np.frombuffer(record_stream.read(num_frames=input_size), dtype=np.int16)
         normalized_input = input.astype(np.float32) * (1.0 / np.iinfo(np.int16).max)
  
         #forms input
@@ -135,7 +135,7 @@ def main():
             output_audio = (res['output'].buffer[0] * np.iinfo(np.int16).max).astype(np.int16)
         else:
             output_audio = input
-        playback_stream.write(output_audio, input_size)
+        playback_stream.write(frames=output_audio, num_frames=input_size)
  
     record_stream.stop_stream()
     record_stream.close()
