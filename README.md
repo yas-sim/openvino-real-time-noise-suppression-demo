@@ -4,8 +4,8 @@
 Intel OpenVINO Toolkit 2021.4 introduced a new deep-learning based audio noise suppression demo. The demo takes an audio input file and produce a noise-suppressed output audio file. The input audio file must meet specific audio file format (WAV, 16KHz, Mono or 2ch).  
  I modified the demo program to make it possible to process real-time audio stream. Now you can use a microphone as 
 input and check noise-supprssed audio with a headphone. The demo program can enable / disable noise suppression function so that you can check the effect immediately.  
-This program processes 2,048 chunks (samples) of audio data in one inference. This means, program have to complete one iteration within 128ms (2,048 * 16KHz) including recording, playback and inference. You may need a high performance PC to achieve real-time performance.      
-
+This program processes 2,048 chunks (samples) of audio data in one inference. This means, program have to complete one iteration within 128ms (2,048 * 16KHz) including recording, playback and inference. You may need a high performance PC to achieve real-time processing.      
+  
 Intel OpenVINO Toolkit 2021.4にディープラーニングベースのオーディオノイズサプレッションデモプログラムが追加されました。このデモプログラムはオーディオファイルを入力とし、ノイズ抑制したオーディオファイルを出力します。入力オーディオファイルは特定のフォーマットである必要があります(WAV, 16KHz, 1ch or 2ch)。  
 今回、このデモプログラムを改造し、リアルタイムに音声ストリームを処理できるようにしました。マイクを使って音声を入力し、ヘッドフォンでノイズ抑制効果を確認できます。簡単に効果の確認ができるようにノイズ抑制をON/OFFすることも可能です。  
 プログラムは2,048-chunk (samples)単位でオーディオデータを処理しています。なので、リアルタイム処理を行うには1サイクルを128ms(2,048 * 16KHz)以内に完了する必要があります。それなりに速いPCをご用意ください。  
