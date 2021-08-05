@@ -21,8 +21,10 @@ import time
 from argparse import ArgumentParser, SUPPRESS
 from pathlib import Path
 
+import datetime
+
 import cv2
-import pyaudio
+import pyaudio, wave
 import threading
  
 import numpy as np
@@ -39,6 +41,8 @@ def build_argparser():
                       help="Optional. Target device to perform inference on. "
                            "Default value is CPU",
                       default="CPU", type=str)
+    parser.add_argument("--audio_log", default=False, action="store_true",
+                        help="Optional. Enable audio logging. Input and output audio will be recorded in '.wav' files.")
     return parser
 
 input_size = 0
@@ -127,6 +131,19 @@ def main():
         config = {}
     ie_encoder_exec = ie.load_network(network=ie_encoder, config=config, device_name=args.device, num_requests=1)
 
+    if args.audio_log:
+        # Open '.wav' files to record input and output audio stream
+        dt = datetime.datetime.now()
+        date_string = '{:04}{:02}{:02}-{:02}{:02}{:02}'.format(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
+        wav_in  = wave.open(date_string+'_in.wav', 'wb')
+        wav_in.setnchannels(1)
+        wav_in.setframerate(16000)
+        wav_in.setsampwidth(2)
+        wav_out = wave.open(date_string+'_out.wav', 'wb') 
+        wav_out.setnchannels(1)
+        wav_out.setframerate(16000)
+        wav_out.setsampwidth(2)
+
     input_size = input_shapes["input"][1]
     res = None
 
@@ -164,6 +181,8 @@ def main():
                 record_buf_lock.acquire()
                 input_audio = record_buf.pop(0)
                 record_buf_lock.release()
+                if args.audio_log:
+                    wav_in.writeframes(input_audio)  # record input audio
                 input = np.frombuffer(input_audio, dtype=np.int16)
 
                 if noise_suppress_flag:
@@ -192,11 +211,18 @@ def main():
                     playback_buf_lock.acquire()
                     playback_buf.append(output_audio)
                     playback_buf_lock.release()
+                    if args.audio_log:
+                        wav_out.writeframes(output_audio.tobytes())  # record output, processed audio
                 else:
                     playback_buf_lock.acquire()
                     playback_buf.append(input_audio)
                     playback_buf_lock.release()
+                    if args.audio_log:
+                        wav_out.writeframes(input_audio)  # record output, non-cooked audio
     finally:
+        if args.audio_log:
+            wav_in.close()
+            wav_out.close()
         exit_flag = True
         rec.join()
         pb.join()

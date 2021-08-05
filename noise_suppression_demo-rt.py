@@ -19,8 +19,10 @@ import logging as log
 import sys
 from argparse import ArgumentParser, SUPPRESS
 from pathlib import Path
- 
-import pyaudio
+
+import datetime
+
+import pyaudio, wave
 import cv2
  
 import numpy as np
@@ -37,6 +39,8 @@ def build_argparser():
                       help="Optional. Target device to perform inference on. "
                            "Default value is CPU",
                       default="CPU", type=str)
+    parser.add_argument("--audio_log", default=False, action="store_true",
+                        help="Optional. Enable audio logging. Input and output audio will be recorded in '.wav' files.")
     return parser
  
 def main():
@@ -82,7 +86,20 @@ def main():
     # get_format_from_width(2), paInt16
     record_stream   = audio.open(format=pyaudio.paInt16, channels=1, rate=16000, input =True, frames_per_buffer=input_size)
     playback_stream = audio.open(format=pyaudio.paInt16, channels=1, rate=16000, output=True, frames_per_buffer=input_size)
- 
+
+    if args.audio_log:
+        # Open '.wav' files to record input and output audio stream
+        dt = datetime.datetime.now()
+        date_string = '{:04}{:02}{:02}-{:02}{:02}{:02}'.format(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
+        wav_in  = wave.open(date_string+'_in.wav', 'wb')
+        wav_in.setnchannels(1)
+        wav_in.setframerate(16000)
+        wav_in.setsampwidth(2)
+        wav_out = wave.open(date_string+'_out.wav', 'wb') 
+        wav_out.setnchannels(1)
+        wav_out.setframerate(16000)
+        wav_out.setsampwidth(2)
+
     samples_out = []
     samples_times = []
  
@@ -105,6 +122,8 @@ def main():
                 print('Noise suppression is diabled')
  
         input = np.frombuffer(record_stream.read(num_frames=input_size), dtype=np.int16)
+        if args.audio_log:
+            wav_in.writeframes(input.tobytes())     # record input audio
         normalized_input = input.astype(np.float32) * (1.0 / np.iinfo(np.int16).max)
  
         #forms input
@@ -134,7 +153,12 @@ def main():
         else:
             output_audio = input
         playback_stream.write(frames=output_audio, num_frames=input_size)
- 
+        if args.audio_log:
+            wav_out.writeframes(output_audio.tobytes())  # record output, processed audio
+
+    if args.audio_log:
+        wav_in.close()
+        wav_out.close()
     record_stream.stop_stream()
     record_stream.close()
     playback_stream.stop_stream()
